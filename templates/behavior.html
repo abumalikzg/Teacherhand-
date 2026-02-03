@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>رصد السلوك</h1>
+<form method="get" class="filters">
+  <label>الفصل:
+    <select name="class_id" onchange="this.form.submit()">
+      {% for c in classes %}
+        <option value="{{ c.id }}" {% if c.id==selected_class_id %}selected{% endif %}>{{ c.name }} ({{ c.grade }})</option>
+      {% endfor %}
+    </select>
+  </label>
+  <label>التاريخ: <input type="date" name="date" value="{{ selected_date }}" onchange="this.form.submit()"></label>
+  <label>الحصة:
+    <select name="period" onchange="this.form.submit()">
+      {% for s in schedule %}
+        <option value="{{ s.period }}" {% if s.period==selected_period %}selected{% endif %}>{{ s.period }} - {{ s.subject }}</option>
+      {% endfor %}
+    </select>
+  </label>
+</form>
+<div class="search">
+  <input id="q" placeholder="ابحث باسم الطالب (3 أحرف)">
+  <button onclick="searchStudents()">بحث</button>
+</div>
+<ul id="results"></ul>
+<form method="post" id="behavior-form" style="display:none;">
+  <input type="hidden" name="class_id" value="{{ selected_class_id }}">
+  <input type="hidden" name="date" value="{{ selected_date }}">
+  <input type="hidden" name="period" value="{{ selected_period }}">
+  <input type="hidden" name="student_id" id="student_id">
+  <div class="behavior-type">
+    <label><input type="radio" name="type" value="positive" checked> سلوك إيجابي</label>
+    <label><input type="radio" name="type" value="negative"> سلوك سلبي</label>
+  </div>
+  <label>السلوك/الوصف:
+    <input name="tag" list="tags" placeholder="اختر أو اكتب">
+    <datalist id="tags">
+      <option value="مشارك"><option value="متفاعل"><option value="متميز"><option value="منجز"><option value="مثابر">
+      <option value="النوم في الفصل"><option value="عدم إحضار الكتاب"><option value="عدم إحضار الأدوات">
+      <option value="عدم حل واجب المنصة"><option value="عدم حل اختبار المنصة"><option value="عدم الجلوس في المقعد">
+      <option value="إثارة الفوضى"><option value="عدم الالتزام بوقت الحصة"><option value="أحاديث جانبية">
+      <option value="عدم المشاركة أثناء الدرس"><option value="عدم إنجاز التكاليف السابقة"><option value="الأكل داخل الفصل">
+      <option value="عدم إحضار المطويات">
+    </datalist>
+  </label>
+  <label>ملاحظة (اختياري):<input name="note"></label>
+  <button class="btn" type="submit">حفظ السلوك</button>
+</form>
+<script>
+function searchStudents(){
+  const q = document.getElementById('q').value;
+  const params = new URLSearchParams({class_id: {{ selected_class_id }}, q});
+  fetch('/api/students?'+params.toString()).then(r=>r.json()).then(rows=>{
+    const ul = document.getElementById('results'); ul.innerHTML='';
+    rows.forEach(s=>{
+      const li = document.createElement('li');
+      li.textContent = s.full_name;
+      li.onclick = ()=>{
+        document.getElementById('student_id').value = s.id;
+        document.getElementById('behavior-form').style.display='block';
+      };
+      ul.appendChild(li);
+    });
+  });
+}
+</script>
+{% endblock %}

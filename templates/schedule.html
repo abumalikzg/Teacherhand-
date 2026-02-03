@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>الجدول الدراسي (الأحد إلى الخميس)</h1>
+<form method="post" action="{{ url_for('add_schedule') }}" class="settings-form">
+  <label>اليوم:
+    <select name="day_of_week">
+      <option value="0">الأحد</option>
+      <option value="1">الاثنين</option>
+      <option value="2">الثلاثاء</option>
+      <option value="3">الأربعاء</option>
+      <option value="4">الخميس</option>
+    </select>
+  </label>
+  <label>الفصل:
+    <select name="class_id">
+      {% for c in classes %}<option value="{{ c.id }}">{{ c.name }} ({{ c.grade }})</option>{% endfor %}
+    </select>
+  </label>
+  <label>رقم الحصة: <input name="period" type="number" min="1" max="7" required></label>
+  <label>المادة: <input name="subject" required></label>
+  <label>من: <input name="start_time" type="time" required></label>
+  <label>إلى: <input name="end_time" type="time" required></label>
+  <button class="btn" type="submit">إضافة إلى الجدول</button>
+</form>
+<h2>الجدول الحالي</h2>
+<table class="table">
+  <thead><tr><th>اليوم</th><th>الحصة</th><th>الفصل</th><th>المادة</th><th>الوقت</th><th>حذف</th></tr></thead>
+  <tbody>
+    {% for s in schedule %}
+      <tr>
+        <td>{{ ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس'][s.day_of_week] }}</td>
+        <td>{{ s.period }}</td>
+        <td>{{ s.class_.name }}</td>
+        <td>{{ s.subject }}</td>
+        <td>{{ s.start_time }} - {{ s.end_time }}</td>
+        <td>
+          <form method="post" action="{{ url_for('delete_schedule', sid=s.id) }}" onsubmit="return confirm('حذف هذا السطر؟');">
+            <button class="btn" type="submit">حذف</button>
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

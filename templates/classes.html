@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>الفصول</h1>
+<table class="table">
+  <thead><tr><th>الفصل</th><th>الصف</th><th>عدد الطلاب</th><th>إجراءات</th></tr></thead>
+  <tbody>
+    {% for c in classes %}
+      <tr>
+        <td>{{ c.name }}</td>
+        <td>{{ c.grade or '-' }}</td>
+        <td>{{ c.students|length }}</td>
+        <td>
+          <a class="btn" href="{{ url_for('students', class_id=c.id) }}">إدارة الطلاب</a>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<hr>
+<h2>إضافة فصل</h2>
+<form method="post" action="{{ url_for('add_class') }}">
+  <label>الاسم: <input name="name" required></label>
+  <label>الصف: <input name="grade"></label>
+  <button class="btn" type="submit">إضافة فصل</button>
+</form>
+{% endblock %}

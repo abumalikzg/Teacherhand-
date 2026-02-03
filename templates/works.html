@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>الأعمال الأدائية (12 خانة × 20)</h1>
+<form method="get" class="filters">
+  <label>الفصل:
+    <select name="class_id" onchange="this.form.submit()">
+      {% for c in classes %}
+        <option value="{{ c.id }}" {% if c.id==selected_class_id %}selected{% endif %}>{{ c.name }} ({{ c.grade }})</option>
+      {% endfor %}
+    </select>
+  </label>
+  <label>الفصل الدراسي:
+    <select name="term" onchange="this.form.submit()">
+      <option value="T1" {% if term=='T1' %}selected{% endif %}>الأول</option>
+      <option value="T2" {% if term=='T2' %}selected{% endif %}>الثاني</option>
+      <option value="T3" {% if term=='T3' %}selected{% endif %}>الثالث</option>
+    </select>
+  </label>
+</form>
+<form method="post">
+  <input type="hidden" name="term" value="{{ term }}">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>الطالب</th>
+        {% for i in range(1,13) %}<th>عمل {{ i }}</th>{% endfor %}
+        <th>عدد المسلّم</th><th>متوسط</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in students %}
+        {% set slots = latest[s.id] %}
+        {% set cnt = slots|select('gt', 0)|list|length %}
+        {% set avg = (slots|sum / 12) | round(2) if slots else 0 %}
+        <tr>
+          <td>{{ s.full_name }}</td>
+          {% for i in range(12) %}
+            <td><input name="slot_{{ s.id }}_{{ i+1 }}" value="{{ slots[i] if slots else '' }}" placeholder="20"></td>
+          {% endfor %}
+          <td>{{ cnt }}</td>
+          <td>{{ avg }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <button class="btn" type="submit">حفظ</button>
+</form>
+{% endblock %}

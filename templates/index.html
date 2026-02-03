@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>حصص اليوم</h1>
+{% if schedule %}
+  <div id="countdown" class="countdown">
+    <div class="subject"><span id="current-subject">—</span> | فصل <span id="current-class">—</span></div>
+    <div class="timer" id="timer">--:--:--</div>
+    <div class="period-info">الحصة <span id="current-period">-</span> — من <span id="start">--:--</span> إلى <span id="end">--:--</span></div>
+    <div class="controls">
+      <label><input type="checkbox" id="sound-toggle" checked> صوت عند نهاية الحصة</label>
+      <audio id="bell" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" preload="auto"></audio>
+    </div>
+  </div>
+
+  <table class="table">
+    <thead><tr><th>#</th><th>المادة</th><th>الوقت</th><th>الفصل</th></tr></thead>
+    <tbody>
+    {% for s in schedule %}
+      <tr>
+        <td>{{ s.period }}</td>
+        <td>{{ s.subject }}</td>
+        <td>{{ s.start_time }} - {{ s.end_time }}</td>
+        <td>{{ s.class_name }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+
+  <script>
+    window.TODAY_SCHEDULE = {{ schedule|tojson }};
+  </script>
+{% else %}
+  <p>لا يوجد جدول لليوم.</p>
+{% endif %}
+{% endblock %}

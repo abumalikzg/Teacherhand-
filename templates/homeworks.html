@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>الواجبات</h1>
+<form method="get" class="filters">
+  <label>الفصل:
+    <select name="class_id" onchange="this.form.submit()">
+      {% for c in classes %}
+        <option value="{{ c.id }}" {% if c.id==selected_class_id %}selected{% endif %}>{{ c.name }} ({{ c.grade }})</option>
+      {% endfor %}
+    </select>
+  </label>
+</form>
+<div class="split">
+  <div>
+    <h2>إضافة واجب</h2>
+    <form method="post" action="{{ url_for('add_homework') }}">
+      <input type="hidden" name="class_id" value="{{ selected_class_id }}">
+      <label>العنوان: <input name="title" required></label>
+      <label>الدرجة القصوى: <input name="max_score" type="number" value="100"></label>
+      <label>التاريخ: <input name="assigned_date" type="date" value="{{ today }}"></label>
+      <button class="btn" type="submit">إضافة</button>
+    </form>
+    <h3>الواجبات الحالية</h3>
+    <ul>
+      {% for h in homeworks %}
+        <li>{{ h.title }} — ({{ h.max_score }}) — {{ h.assigned_date }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+  <div>
+    <h2>درجات الفصل</h2>
+    <form method="post" action="{{ url_for('save_homework_grades') }}">
+      <input type="hidden" name="class_id" value="{{ selected_class_id }}">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>الطالب</th>
+            {% for h in homeworks %}<th>{{ h.title }}</th>{% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in students %}
+            <tr>
+              <td>{{ s.full_name }}</td>
+              {% for h in homeworks %}
+                {% set key = s.id ~ '_' ~ h.id %}
+                <td><input name="grade_{{ s.id }}_{{ h.id }}" value="{{ grades.get(key, '') }}" placeholder="0"></td>
+              {% endfor %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <button class="btn" type="submit">حفظ الدرجات</button>
+    </form>
+    <h3>استيراد درجات من Excel</h3>
+    <form method="post" action="{{ url_for('import_homework_excel', class_id=selected_class_id) }}" enctype="multipart/form-data">
+      <p>ورقة اسمها <b>homeworks</b> — العمود الأول <b>الطالب</b>، الأعمدة التالية عناوين الواجبات.</p>
+      <input type="file" name="file" accept=".xlsx" required>
+      <button class="btn" type="submit">استيراد</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

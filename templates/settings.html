@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>الإعدادات</h1>
+<form method="post" class="settings-form">
+  <label>اسم المعلم: <input name="teacher_name" value="{{ teacher_name }}"></label>
+  <label>مدة الحصة (دقيقة): <input name="period_duration_minutes" value="{{ duration }}" type="number"></label>
+  <button class="btn" type="submit">حفظ</button>
+</form>
+{% endblock %}

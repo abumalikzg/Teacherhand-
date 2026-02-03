@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="report {% if request.args.get('print') %}print-mode{% endif %}">
+  <h1>تقرير الطالب</h1>
+  <p><strong>الاسم:</strong> {{ s.full_name }} — <strong>الفصل:</strong> {{ s.class_.name }} — <strong>الصف:</strong> {{ s.class_.grade }}</p>
+  <p><strong>تاريخ التقرير:</strong> {{ today.isoformat() }}</p>
+  <h2>الغياب</h2>
+  <p>عدد أيام الغياب: {{ absences|length }}</p>
+  {% if absences %}
+  <ul>
+    {% for a in absences %}
+      <li>{{ a.date.isoformat() }} — الحصة {{ a.period }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+  <h2>السلوك الإيجابي</h2>
+  {% if pos %}
+  <ul>
+    {% for b in pos %}
+      <li>{{ b.date.isoformat() }} — {{ b.tag }} (حصة {{ b.period }}) {% if b.note %}— {{ b.note }}{% endif %}</li>
+    {% endfor %}
+  </ul>
+  {% else %}<p>لا توجد مواقف إيجابية مسجلة.</p>{% endif %}
+  <h2>السلوك السلبي</h2>
+  {% if neg %}
+  <ul>
+    {% for b in neg %}
+      <li>{{ b.date.isoformat() }} — {{ b.tag }} (حصة {{ b.period }}) {% if b.note %}— {{ b.note }}{% endif %}</li>
+    {% endfor %}
+  </ul>
+  {% else %}<p>لا توجد مواقف سلوكية سلبية.</p>{% endif %}
+  <h2>الأعمال الأدائية</h2>
+  <p>عدد الأعمال المسلّمة: {{ works_count }} — المتوسط: {{ works_avg }}</p>
+  <h2>الواجبات</h2>
+  <p>عدد الواجبات المحلولة: {{ hw_count }} — متوسط الدرجات: {{ hw_avg }}</p>
+  <h2>الاختبارات</h2>
+  <p>عدد الاختبارات المقدمة: {{ test_count }} — متوسط الدرجات: {{ test_avg }}</p>
+  <div class="footer">
+    <p>معلم العلوم: {{ teacher_name }}</p>
+  </div>
+  <div class="share">
+    {% set text = (
+      "تقرير الطالب: " ~ s.full_name ~ "
+"
+      "الفصل: " ~ s.class_.name ~ " — الصف: " ~ s.class_.grade ~ "
+"
+      "الغياب: " ~ (absences|length)|string ~ "
+"
+      "سلوك إيجابي: " ~ (pos|length)|string ~ " — سلوك سلبي: " ~ (neg|length)|string ~ "
+"
+      "الأعمال الأدائية: عدد " ~ works_count|string ~ " — متوسط " ~ works_avg|string ~ "
+"
+      "الواجبات: " ~ hw_count|string ~ " — متوسط " ~ hw_avg|string ~ "
+"
+      "الاختبارات: " ~ test_count|string ~ " — متوسط " ~ test_avg|string ~ "
+"
+      "معلم العلوم: " ~ teacher_name
+    ) %}
+    <a class="btn" target="_blank" href="https://wa.me/?text={{ text|urlencode }}">مشاركة عبر واتساب</a>
+    <button class="btn" onclick="window.print()">طباعة / حفظ PDF</button>
+  </div>
+</div>
+{% endblock %}

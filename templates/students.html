@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>طلاب الفصل {{ cls.name }} ({{ cls.grade or '' }})</h1>
+<form method="post" class="settings-form" style="margin-bottom:12px;">
+  <label>إضافة طالب جديد:
+    <input name="full_name" placeholder="اكتب اسم الطالب كاملًا">
+  </label>
+  <button class="btn" type="submit">إضافة</button>
+</form>
+<table class="table">
+  <thead><tr><th>اسم الطالب</th><th>تقرير</th><th>حذف</th></tr></thead>
+  <tbody>
+    {% for s in students %}
+      <tr>
+        <td>{{ s.full_name }}</td>
+        <td><a class="btn" href="{{ url_for('report_student', student_id=s.id) }}">تقرير الطالب</a></td>
+        <td>
+          <form method="post" action="{{ url_for('delete_student', class_id=cls.id, student_id=s.id) }}" onsubmit="return confirm('تأكيد حذف الطالب؟');">
+            <button class="btn" type="submit">حذف</button>
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<hr>
+<h2>استيراد طلاب من Excel</h2>
+<form method="post" action="{{ url_for('import_students', class_id=cls.id) }}" enctype="multipart/form-data">
+  <p>ملف Excel (.xlsx) يحتوي عمودًا باسم <strong>الطالب</strong></p>
+  <input type="file" name="file" accept=".xlsx" required>
+  <button class="btn" type="submit">استيراد</button>
+</form>
+{% endblock %}

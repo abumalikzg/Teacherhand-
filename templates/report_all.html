@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>تقارير عامة (جميع الفصول)</h1>
+{% for c in classes %}
+  <h2>الفصل {{ c.name }} ({{ c.grade or '' }})</h2>
+  <p><a class="btn" href="{{ url_for('report_class', class_id=c.id) }}">عرض تقرير الفصل</a>
+     <a class="btn" href="{{ url_for('export_excel_class', class_id=c.id) }}">تصدير Excel</a></p>
+{% endfor %}
+<button class="btn" onclick="window.print()">طباعة / حفظ PDF</button>
+{% endblock %}

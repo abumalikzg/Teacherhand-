@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>رصد الغياب</h1>
+<form method="get" class="filters">
+  <label>الفصل:
+    <select name="class_id" onchange="this.form.submit()">
+      {% for c in classes %}
+        <option value="{{ c.id }}" {% if c.id==selected_class_id %}selected{% endif %}>{{ c.name }} ({{ c.grade }})</option>
+      {% endfor %}
+    </select>
+  </label>
+  <label>التاريخ: <input type="date" name="date" value="{{ selected_date }}" onchange="this.form.submit()"></label>
+  <label>الحصة:
+    <select name="period" onchange="this.form.submit()">
+      {% for s in schedule %}
+        <option value="{{ s.period }}" {% if s.period==selected_period %}selected{% endif %}>{{ s.period }} - {{ s.subject }}</option>
+      {% endfor %}
+    </select>
+  </label>
+</form>
+<form method="post">
+  <input type="hidden" name="class_id" value="{{ selected_class_id }}">
+  <input type="hidden" name="date" value="{{ selected_date }}">
+  <input type="hidden" name="period" value="{{ selected_period }}">
+  <table class="table">
+    <thead><tr><th>الطالب</th><th>الحالة</th></tr></thead>
+    <tbody>
+    {% for s in students %}
+      <tr>
+        <td>{{ s.full_name }}</td>
+        <td>
+          <select name="status_student_{{ s.id }}">
+            <option value="present">حاضر</option>
+            <option value="absent">غائب</option>
+            <option value="excused">مُعذّر</option>
+          </select>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  <button type="submit" class="btn">حفظ الغياب</button>
+</form>
+<div class="exports">
+  <a class="btn" href="{{ url_for('export_excel_class', class_id=selected_class_id) }}">تصدير الفصل (Excel)</a>
+</div>
+{% endblock %}

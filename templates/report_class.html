@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>تقرير الفصل {{ cls.name }} ({{ cls.grade or '' }})</h1>
+<p>عدد الطلاب: {{ students|length }}</p>
+<h2>الملخص</h2>
+<ul>
+  <li>إجمالي أيام الغياب المسجلة: {{ total_absences }}</li>
+  <li>أعلى الطلاب غيابًا: {{ top_absent_name }} ({{ top_absent_count }})</li>
+</ul>
+<h2>جدول موجز</h2>
+<table class="table">
+  <thead>
+    <tr>
+      <th>الطالب</th><th>غياب</th><th>سلوك إيجابي</th><th>سلوك سلبي</th><th>عدد الأعمال</th><th>متوسط الأعمال</th><th>متوسط الواجبات</th><th>متوسط الاختبارات</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in rows %}
+      <tr>
+        <td>{{ row.name }}</td>
+        <td>{{ row.absences }}</td>
+        <td>{{ row.pos }}</td>
+        <td>{{ row.neg }}</td>
+        <td>{{ row.works_count }}</td>
+        <td>{{ row.works_avg }}</td>
+        <td>{{ row.hw_avg }}</td>
+        <td>{{ row.test_avg }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<div class="share">
+  <button class="btn" onclick="window.print()">طباعة / حفظ PDF</button>
+  <a class="btn" href="{{ url_for('export_excel_class', class_id=cls.id) }}">تصدير Excel</a>
+</div>
+{% endblock %}
